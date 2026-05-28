@@ -24,12 +24,14 @@ pip install -r requirements.txt
 python scripts/run_editor.py
 ```
 
-- Left click: paint selected tile
-- Right click: erase to air
-- Keys: `1` air, `2` block, `3` spike, `4` start, `5` end
-- `S`: save to `levels/edited_level.json`
-- `L`: load from `levels/edited_level.json`
-- `V`: validate and print errors
+- Left click: paint selected brush; right click: erase tile
+- Keys: `1` erase, `2` block, `3` spike, `4` start, `5` end
+- `Tab`: cycle Name / Author / Level ID fields (type to edit)
+- `A` / `D`: scroll camera
+- `S`: save to `levels/<level_id>.json` (requires name, author, valid start/end)
+- `L`: load menu (pick a file from `levels/`)
+- `N`: new level
+- `V`: validate
 
 ### Play a level (human)
 
@@ -44,8 +46,10 @@ python scripts/play_level.py levels/example_level.json
 ### Rollout a level (any InputProvider) + log trajectory
 
 ```bash
-python scripts/rollout_level.py levels/example_level.json
+python scripts/rollout_level.py levels/example_level.json --log --capture-every 4
 ```
+
+See `PROGRESS.md` (Milestone 3) for `metadata.json` and `states.csv` field definitions.
 
 Outputs episodes to:
 
