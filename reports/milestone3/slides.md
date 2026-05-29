@@ -30,6 +30,8 @@ Dorian Gulley · James Roberts · Naveen Kannan
 
 # Preliminary Evaluation Setup
 
+<!-- _style: "section { font-size: 32px; } h1 { font-size: 54px; }" -->
+
 **Curriculum.** Five simple levels: flat, one spike, two spikes, late spike, mixed spikes.
 
 **Observation.** Single grayscale image frame, shaped `(1, 96, 96)`.
@@ -38,11 +40,7 @@ Dorian Gulley · James Roberts · Naveen Kannan
 
 **Baseline.** Random binary policy, 30 episodes per level.
 
-**Metrics.**
-
-- Completion rate
-- Average progress
-- Average reward
+**Metrics.** Completion rate, average progress, average reward.
 
 ---
 
@@ -58,11 +56,13 @@ Dorian Gulley · James Roberts · Naveen Kannan
 
 # Training Dynamics
 
+<!-- _style: "section { font-size: 30px; } h1 { font-size: 56px; }" -->
+
 ![bg right:45% fit](assets/training_reward.png)
 
-![height:210px](assets/training_success.png)
+![height:190px](assets/training_success.png)
 
-**Interpretation.** REINFORCE occasionally finds successful episodes, but the policy does not stabilize. This matches expectations for sparse/timing-sensitive rewards with one-frame observations.
+**Takeaway.** REINFORCE sometimes succeeds but remains unstable; sparse timing rewards are the bottleneck.
 
 ---
 
