@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from gdrl.levels import Level, TileType
 
-from .collision import RectF, intersects
+from .collision import RectF, intersects, rect_intersects_triangle
 
 
 @dataclass
@@ -26,6 +26,15 @@ def _tile_rect(level: Level, tx: int, ty: int) -> RectF:
     return RectF(tx * s, ty * s, s, s)
 
 
+def _spike_triangle(level: Level, tx: int, ty: int) -> tuple[tuple[float, float], tuple[float, float], tuple[float, float]]:
+    r = _tile_rect(level, tx, ty)
+    return (
+        (r.left(), r.bottom()),
+        (r.left() + r.w * 0.5, r.top()),
+        (r.right(), r.bottom()),
+    )
+
+
 def _solid_at(level: Level, solid_tiles: set[tuple[int, int]], tx: int, ty: int) -> bool:
     if ty == level.floor_y():
         return True
@@ -34,6 +43,10 @@ def _solid_at(level: Level, solid_tiles: set[tuple[int, int]], tx: int, ty: int)
 
 def _kill_at(level: Level, spike_tiles: set[tuple[int, int]], tx: int, ty: int) -> bool:
     return (tx, ty) in spike_tiles
+
+
+def _hits_spike(level: Level, rect: RectF, spike_tiles: set[tuple[int, int]], tx: int, ty: int) -> bool:
+    return _kill_at(level, spike_tiles, tx, ty) and rect_intersects_triangle(rect, _spike_triangle(level, tx, ty))
 
 
 def _iter_tiles_overlapping(level: Level, rect: RectF) -> list[tuple[int, int]]:
@@ -77,15 +90,15 @@ def step_physics(level: Level, body: PlayerBody, dt: float) -> StepPhysicsResult
         if _solid_at(level, solid_tiles, tx, ty):
             tr = _tile_rect(level, tx, ty)
             if intersects(rect_x, tr):
+                if (tx, ty) in solid_tiles:
+                    died = True
                 if body.vx > 0:
                     new_x = tr.left() - body.w
                 elif body.vx < 0:
                     new_x = tr.right()
                 rect_x = RectF(new_x, body.y, body.w, body.h)
-        if _kill_at(level, spike_tiles, tx, ty):
-            tr = _tile_rect(level, tx, ty)
-            if intersects(rect_x, tr):
-                died = True
+        if _hits_spike(level, rect_x, spike_tiles, tx, ty):
+            died = True
 
     body.x = new_x
 
@@ -106,10 +119,8 @@ def step_physics(level: Level, body: PlayerBody, dt: float) -> StepPhysicsResult
                     died = True
                 body.vy = 0.0
                 rect_y = RectF(body.x, new_y, body.w, body.h)
-        if _kill_at(level, spike_tiles, tx, ty):
-            tr = _tile_rect(level, tx, ty)
-            if intersects(rect_y, tr):
-                died = True
+        if _hits_spike(level, rect_y, spike_tiles, tx, ty):
+            died = True
 
     body.y = new_y
     body.grounded = grounded
@@ -126,4 +137,3 @@ def step_physics(level: Level, body: PlayerBody, dt: float) -> StepPhysicsResult
         body.vy = 0.0
 
     return StepPhysicsResult(died=died)
-

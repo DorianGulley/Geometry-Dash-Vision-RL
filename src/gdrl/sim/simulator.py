@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 
-from gdrl.levels import Level
+from gdrl.levels import Level, TileType
 
 from .events import EpisodeResult
 from .physics import PlayerBody, StepPhysicsResult, jump, step_physics
@@ -46,8 +45,7 @@ class Simulator:
         self.level = level
         self.dt = float(level.physics.fixed_dt)
         self.max_steps = max_steps if max_steps is not None else self._default_max_steps()
-        self.jump_height_tiles = 2.0
-        self._jump_velocity = self._compute_jump_velocity()
+        self._jump_velocity = float(level.physics.jump_velocity)
 
         self._timestep = 0
         self._done = False
@@ -56,13 +54,6 @@ class Simulator:
         self._reason = ""
 
         self.player = self._spawn_player()
-
-    def _compute_jump_velocity(self) -> float:
-        # Enforce a deterministic "exactly N tiles" ballistic apex height:
-        # v^2 = 2 g h  ->  v = -sqrt(2 g h)
-        g = float(self.level.physics.gravity)
-        h = float(self.jump_height_tiles) * float(self.level.tile_size)
-        return -math.sqrt(max(0.0, 2.0 * g * h))
 
     def _default_max_steps(self) -> int:
         # Conservative timeout: enough time to traverse level at scroll speed plus slack.
@@ -95,15 +86,14 @@ class Simulator:
         self._completed = False
         self._reason = ""
         self.player = self._spawn_player()
-        # Ensure we start "grounded" if placed on top of floor.
-        _ = step_physics(self.level, self.player, 0.0)
+        self._snap_player_to_ground()
         return self.state()
 
     def progress(self) -> float:
         s = self.level.tile_size
-        start_x = self.level.start.x * s
-        end_x = self.level.end.x * s
-        denom = max(1.0, end_x - start_x)
+        start_x = self._spawn_x()
+        complete_x = self.level.end.x * s - self.player.w
+        denom = max(1.0, complete_x - start_x)
         return _clamp01((self.player.x - start_x) / denom)
 
     def state(self) -> State:
@@ -134,6 +124,29 @@ class Simulator:
         end_x_px = self.level.end.x * self.level.tile_size
         return (self.player.x + self.player.w) >= end_x_px
 
+    def _spawn_x(self) -> float:
+        s = self.level.tile_size
+        w = 0.8 * s
+        return float(self.level.start.x * s + (s - w) * 0.5)
+
+    def _snap_player_to_ground(self) -> None:
+        s = self.level.tile_size
+        bottom = self.player.y + self.player.h
+        candidates = [self.level.floor_y() * s]
+        candidates.extend(t.y * s for t in self.level.tiles if t.type == TileType.BLOCK and self._overlaps_tile_x(t.x))
+        top = nearest_ground_top(candidates, bottom, max_snap=s * 2.0)
+        if top is None:
+            return
+        self.player.y = top - self.player.h
+        self.player.vy = 0.0
+        self.player.grounded = True
+
+    def _overlaps_tile_x(self, tx: int) -> bool:
+        s = self.level.tile_size
+        left = tx * s
+        right = left + s
+        return self.player.x < right and self.player.x + self.player.w > left
+
     def step(self, action: Action) -> tuple[State, EpisodeResult | None]:
         if self._done:
             return self.state(), self.episode_result()
@@ -159,3 +172,9 @@ class Simulator:
 
         return self.state(), self.episode_result()
 
+
+def nearest_ground_top(candidates: list[float], bottom: float, *, max_snap: float) -> float | None:
+    below = [top for top in candidates if 0.0 <= top - bottom <= max_snap]
+    if not below:
+        return None
+    return min(below, key=lambda top: top - bottom)
