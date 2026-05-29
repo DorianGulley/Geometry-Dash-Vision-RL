@@ -60,9 +60,65 @@ dataset/episodes/episode_000001/
   frames/000000.png ...
 ```
 
+### Gymnasium-style environment
+
+```python
+from gdrl.envs import GDRLEnv, ObservationConfig
+
+env = GDRLEnv("levels/example_level.json", observation_config=ObservationConfig(width=96, height=96))
+obs, info = env.reset()
+obs, reward, terminated, truncated, info = env.step(1)  # 1 = jump, 0 = no jump
+```
+
+Observations are one-frame `uint8` grayscale image tensors shaped `(1, H, W)`.
+Rewards use simple progress shaping plus terminal bonuses and penalties.
+
+For quick training smoke tests, use a deterministic generated level:
+
+```python
+from gdrl.envs import make_simple_env
+from gdrl.levels import make_tiny_spike_level
+
+env = make_simple_env(seed=0)
+level = make_tiny_spike_level()
+```
+
+For a no-jump smoke run:
+
+```python
+from gdrl.envs import make_simple_env, run_episode
+
+stats = run_episode(make_simple_env(seed=0), max_steps=200)
+```
+
+Create the tiny one-frame CNN policy:
+
+```python
+from gdrl.training import TinyJumpCNN
+
+model = TinyJumpCNN()
+```
+
+Train the CNN directly with a minimal REINFORCE loop:
+
+```bash
+python scripts/train_reinforce.py levels/tiny_spikes.json --episodes 200
+```
+
+Evaluate a saved policy checkpoint:
+
+```bash
+python scripts/eval_policy.py checkpoints/tiny_reinforce.pt --level levels/tiny_spikes.json
+```
+
+Evaluate the random baseline on the starter curriculum:
+
+```bash
+python scripts/eval_random.py --episodes 20
+```
+
 ## Notes
 
 - **Tile coordinates**: JSON uses tile coordinates; internal sim uses pixel coordinates.
 - **Implicit floor**: solid floor exists at `y = height - 1` and is not stored in `tiles`.
 - **Determinism**: simulation uses a fixed `dt` (default 60 Hz) independent of rendering FPS.
-

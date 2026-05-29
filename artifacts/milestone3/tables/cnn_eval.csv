@@ -1,0 +1,6 @@
+method,level,episodes,success_rate,avg_progress,avg_reward
+cnn_reinforce,flat_empty,20,1.0,1.0,58.64
+cnn_reinforce,late_spike,20,1.0,1.0,57.88000000000001
+cnn_reinforce,mixed_spikes,20,1.0,1.0,57.61999999999999
+cnn_reinforce,one_spike,20,0.0,0.4855577689243028,-20.924422310756974
+cnn_reinforce,two_spikes,20,0.0,0.6335910652920963,-19.844089347079034
