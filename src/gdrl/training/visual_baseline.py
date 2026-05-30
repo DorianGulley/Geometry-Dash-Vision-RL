@@ -73,7 +73,7 @@ class SpikeTimingPolicy:
         return int(any(start <= timestep < start + self.pulse_steps for start in self._jump_steps))
 
     def _schedule(self, obs: np.ndarray) -> list[int]:
-        centers = spike_like_centers(
+        centers = obstacle_like_centers(
             obs,
             row_start=self.row_start,
             row_end=self.row_end,
@@ -92,7 +92,7 @@ class SpikeTimingPolicy:
         return dedupe_close_steps(jump_steps)
 
 
-def spike_like_centers(
+def obstacle_like_centers(
     obs: np.ndarray,
     *,
     row_start: int,
@@ -110,7 +110,7 @@ def spike_like_centers(
         heights = group.sum(axis=0)
         width = right - left + 1
         pixels = int(heights.sum())
-        if 2 <= width <= 4 and pixels >= min_pixels and len(set(heights.tolist())) > 1:
+        if 2 <= width <= 10 and pixels >= min_pixels:
             centers.append((left + right) / 2.0)
     return centers
 

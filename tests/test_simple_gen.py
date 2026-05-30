@@ -4,8 +4,10 @@ from gdrl.levels import (
     SimpleLevelConfig,
     load_level,
     make_curriculum_levels,
+    make_pillar_sweep,
     make_simple_level,
     make_single_spike_sweep,
+    make_stair_sweep,
     make_three_spike_sweep,
     make_tiny_spike_level,
     make_two_spike_sweep,
@@ -90,6 +92,30 @@ def test_three_spike_sweep_is_valid_and_checked_in() -> None:
     seen: set[str] = set()
 
     for path in sorted(Path("levels/generated/three_spike").glob("*.json")):
+        level = load_level(path)
+        seen.add(level.meta.level_id)
+        assert validate_level(level) == []
+        assert level.to_dict() == generated[level.meta.level_id]
+    assert seen == set(generated)
+
+
+def test_pillar_sweep_is_valid_and_checked_in() -> None:
+    generated = {level.meta.level_id: level.to_dict() for level in make_pillar_sweep()}
+    seen: set[str] = set()
+
+    for path in sorted(Path("levels/generated/pillar").glob("*.json")):
+        level = load_level(path)
+        seen.add(level.meta.level_id)
+        assert validate_level(level) == []
+        assert level.to_dict() == generated[level.meta.level_id]
+    assert seen == set(generated)
+
+
+def test_stair_sweep_is_valid_and_checked_in() -> None:
+    generated = {level.meta.level_id: level.to_dict() for level in make_stair_sweep()}
+    seen: set[str] = set()
+
+    for path in sorted(Path("levels/generated/stair").glob("*.json")):
         level = load_level(path)
         seen.add(level.meta.level_id)
         assert validate_level(level) == []

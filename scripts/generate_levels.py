@@ -15,6 +15,8 @@ def main() -> int:
 
     from gdrl.levels import (
         make_single_spike_sweep,
+        make_pillar_sweep,
+        make_stair_sweep,
         make_three_spike_sweep,
         make_two_spike_sweep,
         save_level,
@@ -29,6 +31,8 @@ def main() -> int:
         "single_spike": make_single_spike_sweep(),
         "two_spike": make_two_spike_sweep(),
         "three_spike": make_three_spike_sweep(),
+        "pillar": make_pillar_sweep(),
+        "stair": make_stair_sweep(),
     }
     for family, levels in generated.items():
         for level in levels:

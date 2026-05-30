@@ -33,6 +33,8 @@ def main() -> int:
             "levels/generated/single_spike",
             "levels/generated/two_spike",
             "levels/generated/three_spike",
+            "levels/generated/pillar",
+            "levels/generated/stair",
         ],
     )
     ap.add_argument("--updates-per-stage", type=int, default=2)

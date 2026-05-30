@@ -99,6 +99,88 @@ def make_three_spike_sweep() -> list[Level]:
     ]
 
 
+def make_pillar_sweep() -> list[Level]:
+    levels: list[Level] = []
+    for x in [12, 14, 16, 18, 20]:
+        levels.append(
+            make_fixed_tile_level(
+                f"pillar_x{x}",
+                f"Pillar X{x}",
+                [Tile(x=x, y=10, type=TileType.BLOCK)],
+                width=max(36, x + 14),
+                tags=["train", "generated", "pillar"],
+            )
+        )
+        levels.append(
+            make_fixed_tile_level(
+                f"tall_pillar_x{x}",
+                f"Tall Pillar X{x}",
+                [
+                    Tile(x=x, y=10, type=TileType.BLOCK),
+                    Tile(x=x, y=9, type=TileType.BLOCK),
+                ],
+                width=max(36, x + 14),
+                tags=["train", "generated", "pillar"],
+            )
+        )
+    return levels
+
+
+def make_stair_sweep() -> list[Level]:
+    stair_tiles = [
+        [Tile(x=12, y=10, type=TileType.BLOCK), Tile(x=13, y=9, type=TileType.BLOCK)],
+        [Tile(x=14, y=10, type=TileType.BLOCK), Tile(x=15, y=9, type=TileType.BLOCK)],
+        [
+            Tile(x=12, y=10, type=TileType.BLOCK),
+            Tile(x=13, y=9, type=TileType.BLOCK),
+            Tile(x=14, y=8, type=TileType.BLOCK),
+        ],
+        [
+            Tile(x=14, y=10, type=TileType.BLOCK),
+            Tile(x=15, y=9, type=TileType.BLOCK),
+            Tile(x=16, y=8, type=TileType.BLOCK),
+        ],
+    ]
+    return [
+        make_fixed_tile_level(
+            f"stair_{i}",
+            f"Stair {i}",
+            tiles,
+            width=40,
+            tags=["train", "generated", "stair"],
+        )
+        for i, tiles in enumerate(stair_tiles, start=1)
+    ]
+
+
+def make_fixed_tile_level(
+    level_id: str,
+    name: str,
+    tiles: list[Tile],
+    *,
+    width: int,
+    tags: list[str],
+) -> Level:
+    floor_y = 11
+    player_y = floor_y - 2
+    return Level(
+        meta=LevelMetadata(
+            level_id=level_id,
+            name=name,
+            author="local",
+            tags=tags,
+        ),
+        width=width,
+        height=12,
+        tile_size=32,
+        start=Vec2i(2, player_y),
+        end=Vec2i(width - 4, player_y),
+        physics=PhysicsSpec(),
+        camera=CameraSpec(),
+        tiles=tiles,
+    )
+
+
 def make_fixed_spike_level(
     level_id: str,
     name: str,
