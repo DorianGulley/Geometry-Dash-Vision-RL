@@ -76,6 +76,29 @@ def make_two_spike_sweep(
     return levels
 
 
+def make_three_spike_sweep() -> list[Level]:
+    spike_sets = [
+        [10, 16, 24],
+        [10, 18, 24],
+        [10, 18, 26],
+        [10, 18, 28],
+        [10, 20, 28],
+        [12, 18, 26],
+        [12, 20, 26],
+        [12, 20, 28],
+    ]
+    return [
+        make_fixed_spike_level(
+            f"three_spikes_{'_'.join(str(x) for x in xs)}",
+            f"Three Spikes {' '.join(str(x) for x in xs)}",
+            xs,
+            width=max(44, xs[-1] + 14),
+            tags=["train", "generated", "three_spike"],
+        )
+        for xs in spike_sets
+    ]
+
+
 def make_fixed_spike_level(
     level_id: str,
     name: str,

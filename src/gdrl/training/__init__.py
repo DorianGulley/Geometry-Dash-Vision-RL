@@ -10,7 +10,7 @@ from .reinforce import (
     run_policy_episode,
     train_reinforce,
 )
-from .visual_baseline import SpikeWindowPolicy
+from .visual_baseline import SpikeTimingPolicy, SpikeWindowPolicy
 
 __all__ = [
     "EvalRow",
@@ -29,6 +29,7 @@ __all__ = [
     "run_greedy_episode",
     "run_policy_episode",
     "save_policy",
+    "SpikeTimingPolicy",
     "SpikeWindowPolicy",
     "train_reinforce",
     "train_ppo",

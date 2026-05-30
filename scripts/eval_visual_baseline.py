@@ -14,13 +14,14 @@ def main() -> int:
     _add_src_to_path()
 
     from gdrl.envs import GDRLEnv, run_episode
-    from gdrl.training import SpikeWindowPolicy
+    from gdrl.training import SpikeTimingPolicy, SpikeWindowPolicy
 
     ap = argparse.ArgumentParser(description="Evaluate the simple visual spike-window baseline.")
     ap.add_argument("levels_path", nargs="?", default="levels/curriculum")
+    ap.add_argument("--policy", choices=["timing", "window"], default="timing")
     args = ap.parse_args()
 
-    policy = SpikeWindowPolicy()
+    policy = SpikeTimingPolicy() if args.policy == "timing" else SpikeWindowPolicy()
     paths = collect_level_paths(Path(args.levels_path))
     print("level,completed,progress,reward,steps")
     for path in paths:

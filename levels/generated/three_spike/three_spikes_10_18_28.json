@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "level_id": "three_spikes_10_18_28",
+  "name": "Three Spikes 10 18 28",
+  "author": "local",
+  "split": "train",
+  "tags": [
+    "train",
+    "generated",
+    "three_spike"
+  ],
+  "version": "0.0.1",
+  "width": 44,
+  "height": 12,
+  "tile_size": 32,
+  "start": {
+    "x": 2,
+    "y": 9
+  },
+  "end": {
+    "x": 40,
+    "y": 9
+  },
+  "physics": {
+    "fixed_dt": 0.016666666666666666,
+    "gravity": 2200.0,
+    "jump_velocity": -750.0,
+    "scroll_speed": 300.0
+  },
+  "camera": {
+    "screen_width": 960,
+    "screen_height": 540,
+    "player_screen_x": 240
+  },
+  "tiles": [
+    {
+      "x": 10,
+      "y": 10,
+      "type": "spike"
+    },
+    {
+      "x": 18,
+      "y": 10,
+      "type": "spike"
+    },
+    {
+      "x": 28,
+      "y": 10,
+      "type": "spike"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ from .simple_gen import (
     make_curriculum_levels,
     make_simple_level,
     make_single_spike_sweep,
+    make_three_spike_sweep,
     make_tiny_spike_level,
     make_two_spike_sweep,
 )
@@ -30,6 +31,7 @@ __all__ = [
     "make_curriculum_levels",
     "make_simple_level",
     "make_single_spike_sweep",
+    "make_three_spike_sweep",
     "make_tiny_spike_level",
     "make_two_spike_sweep",
     "SimpleLevelConfig",
