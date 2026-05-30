@@ -180,6 +180,38 @@ def trace_completed_info(info: dict) -> bool:
     return bool(info.get("episode", {}).get("completed", False))
 
 
+def evaluate_stochastic_policy(env: GDRLEnv, model: TinyJumpCNN, *, episodes: int = 10) -> EvalResult:
+    rewards: list[float] = []
+    progress: list[float] = []
+    jump_rates: list[float] = []
+    completed = 0
+
+    for _ in range(episodes):
+        obs, info = env.reset()
+        done = False
+        total_reward = 0.0
+        actions: list[int] = []
+
+        while not done:
+            x = obs_to_tensor(obs)
+            with torch.no_grad():
+                dist = Categorical(logits=model(x))
+                action = int(dist.sample().item())
+            obs, reward, terminated, truncated, info = env.step(action)
+            total_reward += float(reward)
+            actions.append(action)
+            done = terminated or truncated
+
+        episode = info.get("episode", {})
+        completed += int(bool(episode.get("completed", False)))
+        progress.append(float(episode.get("progress", info.get("progress", 0.0))))
+        rewards.append(total_reward)
+        jump_rates.append(sum(actions) / max(1, len(actions)))
+
+    n = max(1, episodes)
+    return EvalResult(episodes, completed / n, sum(rewards) / n, sum(progress) / n, sum(jump_rates) / n)
+
+
 def set_seed(seed: int) -> None:
     random.seed(seed)
     np.random.seed(seed)

@@ -15,7 +15,13 @@ def main() -> int:
     _add_src_to_path()
 
     from gdrl.envs import GDRLEnv
-    from gdrl.training import PPOConfig, evaluate_policy, save_policy, train_ppo
+    from gdrl.training import (
+        PPOConfig,
+        evaluate_policy,
+        evaluate_stochastic_policy,
+        save_policy,
+        train_ppo,
+    )
     from gdrl.training.ppo import level_paths
 
     ap = argparse.ArgumentParser(description="Train TinyJumpCNN with a small PPO loop.")
@@ -61,12 +67,14 @@ def main() -> int:
     print(f"train_avg_jump_rate={sum(result.jump_rates) / max(1, len(result.jump_rates)):.3f}")
     eval_rows = []
     for path in paths:
-        eval_result = evaluate_policy(GDRLEnv(path), model, episodes=args.eval_episodes)
-        eval_rows.append((path.stem, eval_result))
+        greedy = evaluate_policy(GDRLEnv(path), model, episodes=args.eval_episodes)
+        stochastic = evaluate_stochastic_policy(GDRLEnv(path), model, episodes=args.eval_episodes)
+        eval_rows.append((path.stem, greedy, stochastic))
         print(
-            f"eval_level={path.stem} success_rate={eval_result.success_rate:.3f} "
-            f"avg_progress={eval_result.avg_progress:.3f} "
-            f"jump_rate={eval_result.avg_jump_rate:.3f}"
+            f"eval_level={path.stem} greedy_success={greedy.success_rate:.3f} "
+            f"sampled_success={stochastic.success_rate:.3f} "
+            f"greedy_progress={greedy.avg_progress:.3f} "
+            f"sampled_progress={stochastic.avg_progress:.3f}"
         )
     write_eval_metrics(eval_rows, metrics_dir / "eval_by_level.csv")
     write_plots(result, eval_rows, metrics_dir)
@@ -89,15 +97,30 @@ def write_training_metrics(result, path: Path) -> None:
 def write_eval_metrics(rows, path: Path) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["level", "episodes", "success_rate", "avg_progress", "avg_reward", "avg_jump_rate"])
-        for level, result in rows:
+        writer.writerow([
+            "level",
+            "episodes",
+            "greedy_success",
+            "sampled_success",
+            "greedy_progress",
+            "sampled_progress",
+            "greedy_reward",
+            "sampled_reward",
+            "greedy_jump_rate",
+            "sampled_jump_rate",
+        ])
+        for level, greedy, sampled in rows:
             writer.writerow([
                 level,
-                result.episodes,
-                result.success_rate,
-                result.avg_progress,
-                result.avg_reward,
-                result.avg_jump_rate,
+                greedy.episodes,
+                greedy.success_rate,
+                sampled.success_rate,
+                greedy.avg_progress,
+                sampled.avg_progress,
+                greedy.avg_reward,
+                sampled.avg_reward,
+                greedy.avg_jump_rate,
+                sampled.avg_jump_rate,
             ])
 
 
@@ -108,13 +131,13 @@ def write_plots(result, eval_rows, out_dir: Path) -> None:
     plot_training_series(rolling_mean([float(x) for x in result.completed], 10), "Rolling success", out_dir / "training_success.png")
     plot_training_series(rolling_mean(result.jump_rates, 10), "Rolling jump rate", out_dir / "training_jump_rate.png")
 
-    levels = [level for level, _ in eval_rows]
-    success = [res.success_rate for _, res in eval_rows]
-    progress = [res.avg_progress for _, res in eval_rows]
+    levels = [level for level, _, _ in eval_rows]
+    greedy_success = [greedy.success_rate for _, greedy, _ in eval_rows]
+    sampled_success = [sampled.success_rate for _, _, sampled in eval_rows]
     x = range(len(levels))
     plt.figure(figsize=(8, 4))
-    plt.bar([i - 0.18 for i in x], success, width=0.36, label="Success")
-    plt.bar([i + 0.18 for i in x], progress, width=0.36, label="Progress")
+    plt.bar([i - 0.18 for i in x], greedy_success, width=0.36, label="Greedy")
+    plt.bar([i + 0.18 for i in x], sampled_success, width=0.36, label="Sampled")
     plt.xticks(list(x), levels, rotation=25, ha="right")
     plt.ylim(0, 1.05)
     plt.ylabel("Rate")

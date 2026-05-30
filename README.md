@@ -131,6 +131,12 @@ python scripts/train_ppo.py levels/curriculum --updates 20 --metrics-dir artifac
 
 This writes `training_episodes.csv`, `eval_by_level.csv`, and training/eval plots.
 
+Run a staged PPO curriculum over generated spike families:
+
+```bash
+python scripts/train_ppo_curriculum.py --updates-per-stage 5
+```
+
 Regenerate the simple single-, two-, and three-spike training sweeps:
 
 ```bash

@@ -1,7 +1,7 @@
 import random
 
 from gdrl.envs import GDRLEnv
-from gdrl.training import PPOConfig, TinyJumpCNN, train_ppo
+from gdrl.training import PPOConfig, TinyJumpCNN, evaluate_stochastic_policy, train_ppo
 from gdrl.training.ppo import collect_rollouts
 
 
@@ -27,3 +27,11 @@ def test_train_ppo_smoke() -> None:
     assert isinstance(model, TinyJumpCNN)
     assert len(result.rewards) == 2
     assert len(result.eval_results) == 1
+
+
+def test_evaluate_stochastic_policy_smoke() -> None:
+    result = evaluate_stochastic_policy(GDRLEnv("levels/tiny_spikes.json"), TinyJumpCNN(), episodes=2)
+
+    assert result.episodes == 2
+    assert 0.0 <= result.success_rate <= 1.0
+    assert 0.0 <= result.avg_jump_rate <= 1.0

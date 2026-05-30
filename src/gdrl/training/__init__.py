@@ -1,6 +1,6 @@
 from .baselines import EvalRow, eval_random, eval_random_level, random_policy
 from .policy_net import PolicyNetConfig, TinyJumpCNN, load_policy, save_policy
-from .ppo import PPOConfig, PPOTrainResult, train_ppo
+from .ppo import PPOConfig, PPOTrainResult, evaluate_stochastic_policy, train_ppo
 from .reinforce import (
     EvalResult,
     ReinforceConfig,
@@ -24,6 +24,7 @@ __all__ = [
     "eval_random",
     "eval_random_level",
     "evaluate_policy",
+    "evaluate_stochastic_policy",
     "load_policy",
     "random_policy",
     "run_greedy_episode",
