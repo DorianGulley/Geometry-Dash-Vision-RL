@@ -12,6 +12,7 @@ from .simple_gen import (
     SimpleLevelConfig,
     make_curriculum_levels,
     make_simple_level,
+    make_single_spike_sweep,
     make_tiny_spike_level,
 )
 from .validation import ValidationError, validate_level
@@ -27,6 +28,7 @@ __all__ = [
     "load_level",
     "make_curriculum_levels",
     "make_simple_level",
+    "make_single_spike_sweep",
     "make_tiny_spike_level",
     "SimpleLevelConfig",
     "save_level",

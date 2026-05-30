@@ -272,6 +272,7 @@ def run_episode(env: GDRLEnv, policy: Policy | None = None, *, max_steps: int | 
 
     while not (terminated or truncated):
         if max_steps is not None and steps >= max_steps:
+            truncated = True
             break
         action = 0 if policy is None else policy(obs, info)
         obs, reward, terminated, truncated, info = env.step(action)

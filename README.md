@@ -117,6 +117,24 @@ Evaluate the random baseline on the starter curriculum:
 python scripts/eval_random.py --episodes 20
 ```
 
+Evaluate the simple grayscale visual baseline:
+
+```bash
+python scripts/eval_visual_baseline.py levels/curriculum
+```
+
+Train PPO on all JSON levels in a directory:
+
+```bash
+python scripts/train_ppo.py levels/curriculum --updates 20
+```
+
+Regenerate the single-spike training sweep:
+
+```bash
+python scripts/generate_levels.py
+```
+
 ## Notes
 
 - **Tile coordinates**: JSON uses tile coordinates; internal sim uses pixel coordinates.

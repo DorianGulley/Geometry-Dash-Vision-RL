@@ -34,14 +34,19 @@ def main() -> int:
     rewards: list[float] = []
     completed: list[bool] = []
 
-    def on_episode(i: int, reward: float, done: bool) -> None:
+    def on_episode(i: int, reward: float, done: bool, jump_rate: float) -> None:
         rewards.append(reward)
         completed.append(done)
 
-    cfg = ReinforceConfig(episodes=80, lr=1e-3, seed=0, entropy_weight=0.02)
+    cfg = ReinforceConfig(episodes=80, lr=1e-3, seed=0, entropy_weight=0.0, batch_episodes=8)
     model, train_result = train_reinforce(env, config=cfg, on_episode=on_episode)
     save_policy(model, ckpts / "one_spike_reinforce.pt")
-    write_training_csv(train_result.rewards, train_result.completed, tables / "cnn_training.csv")
+    write_training_csv(
+        train_result.rewards,
+        train_result.completed,
+        train_result.jump_rates,
+        tables / "cnn_training.csv",
+    )
 
     eval_rows = []
     for level_path in level_paths:
@@ -65,20 +70,33 @@ def write_random_csv(rows, path: Path) -> None:
             writer.writerow(["random", row.level_id, row.episodes, row.success_rate, row.avg_progress, row.avg_reward])
 
 
-def write_training_csv(rewards: list[float], completed: list[bool], path: Path) -> None:
+def write_training_csv(
+    rewards: list[float],
+    completed: list[bool],
+    jump_rates: list[float],
+    path: Path,
+) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["episode", "reward", "completed"])
-        for i, (reward, done) in enumerate(zip(rewards, completed), start=1):
-            writer.writerow([i, reward, int(done)])
+        writer.writerow(["episode", "reward", "completed", "jump_rate"])
+        for i, (reward, done, jump_rate) in enumerate(zip(rewards, completed, jump_rates), start=1):
+            writer.writerow([i, reward, int(done), jump_rate])
 
 
 def write_cnn_csv(rows, path: Path) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["method", "level", "episodes", "success_rate", "avg_progress", "avg_reward"])
+        writer.writerow(["method", "level", "episodes", "success_rate", "avg_progress", "avg_reward", "avg_jump_rate"])
         for level, result in rows:
-            writer.writerow(["cnn_reinforce", level, result.episodes, result.success_rate, result.avg_progress, result.avg_reward])
+            writer.writerow([
+                "cnn_reinforce",
+                level,
+                result.episodes,
+                result.success_rate,
+                result.avg_progress,
+                result.avg_reward,
+                result.avg_jump_rate,
+            ])
 
 
 def write_comparison_csv(random_rows, cnn_rows, path: Path) -> None:

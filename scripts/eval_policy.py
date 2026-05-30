@@ -28,6 +28,7 @@ def main() -> int:
     print(f"success_rate={result.success_rate:.3f}")
     print(f"avg_reward={result.avg_reward:.3f}")
     print(f"avg_progress={result.avg_progress:.3f}")
+    print(f"avg_jump_rate={result.avg_jump_rate:.3f}")
     return 0
 
 

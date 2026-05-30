@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "level_id": "single_spike_x16",
+  "name": "Single Spike X16",
+  "author": "local",
+  "split": "train",
+  "tags": [
+    "train",
+    "generated",
+    "single_spike"
+  ],
+  "version": "0.0.1",
+  "width": 32,
+  "height": 12,
+  "tile_size": 32,
+  "start": {
+    "x": 2,
+    "y": 9
+  },
+  "end": {
+    "x": 28,
+    "y": 9
+  },
+  "physics": {
+    "fixed_dt": 0.016666666666666666,
+    "gravity": 2200.0,
+    "jump_velocity": -750.0,
+    "scroll_speed": 300.0
+  },
+  "camera": {
+    "screen_width": 960,
+    "screen_height": 540,
+    "player_screen_x": 240
+  },
+  "tiles": [
+    {
+      "x": 16,
+      "y": 10,
+      "type": "spike"
+    }
+  ]
+}

@@ -40,7 +40,28 @@ def make_curriculum_levels() -> list[Level]:
     ]
 
 
-def make_fixed_spike_level(level_id: str, name: str, spike_xs: list[int], *, width: int) -> Level:
+def make_single_spike_sweep(spike_xs: list[int] | None = None) -> list[Level]:
+    xs = spike_xs or [10, 12, 14, 16, 18, 20, 22, 24]
+    return [
+        make_fixed_spike_level(
+            f"single_spike_x{x}",
+            f"Single Spike X{x}",
+            [x],
+            width=max(32, x + 12),
+            tags=["train", "generated", "single_spike"],
+        )
+        for x in xs
+    ]
+
+
+def make_fixed_spike_level(
+    level_id: str,
+    name: str,
+    spike_xs: list[int],
+    *,
+    width: int,
+    tags: list[str] | None = None,
+) -> Level:
     floor_y = 11
     player_y = floor_y - 2
     spike_y = floor_y - 1
@@ -49,7 +70,7 @@ def make_fixed_spike_level(level_id: str, name: str, spike_xs: list[int], *, wid
             level_id=level_id,
             name=name,
             author="local",
-            tags=["train", "curriculum"],
+            tags=tags or ["train", "curriculum"],
         ),
         width=width,
         height=12,

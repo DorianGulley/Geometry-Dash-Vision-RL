@@ -31,10 +31,15 @@ class TinyJumpCNN(nn.Module):
             nn.Flatten(),
         )
         self.head = nn.Linear(self._feature_dim(), self.config.actions)
+        self.value_head = nn.Linear(self._feature_dim(), 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.float() / 255.0
         return self.head(self.features(x))
+
+    def value(self, x: torch.Tensor) -> torch.Tensor:
+        x = x.float() / 255.0
+        return self.value_head(self.features(x)).squeeze(-1)
 
     def act(self, obs: np.ndarray) -> int:
         with torch.no_grad():
@@ -65,6 +70,6 @@ def save_policy(model: TinyJumpCNN, path: str | Path) -> None:
 def load_policy(path: str | Path, config: PolicyNetConfig | None = None) -> TinyJumpCNN:
     model = TinyJumpCNN(config)
     state = torch.load(path, map_location="cpu")
-    model.load_state_dict(state)
+    model.load_state_dict(state, strict=False)
     model.eval()
     return model

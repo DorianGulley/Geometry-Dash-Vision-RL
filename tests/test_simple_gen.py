@@ -1,7 +1,11 @@
+from pathlib import Path
+
 from gdrl.levels import (
     SimpleLevelConfig,
+    load_level,
     make_curriculum_levels,
     make_simple_level,
+    make_single_spike_sweep,
     make_tiny_spike_level,
     validate_level,
 )
@@ -40,3 +44,25 @@ def test_curriculum_levels_are_fixed_and_valid() -> None:
         "mixed_spikes",
     ]
     assert all(validate_level(level) == [] for level in levels)
+
+
+def test_checked_in_curriculum_matches_generator() -> None:
+    generated = {level.meta.level_id: level.to_dict() for level in make_curriculum_levels()}
+
+    for path in sorted(Path("levels/curriculum").glob("*.json")):
+        level = load_level(path)
+        assert level.to_dict() == generated[level.meta.level_id]
+
+
+def test_checked_in_levels_are_valid() -> None:
+    for path in sorted(Path("levels").rglob("*.json")):
+        assert validate_level(load_level(path)) == []
+
+
+def test_single_spike_sweep_is_valid_and_checked_in() -> None:
+    generated = {level.meta.level_id: level.to_dict() for level in make_single_spike_sweep()}
+
+    for path in sorted(Path("levels/generated/single_spike").glob("*.json")):
+        level = load_level(path)
+        assert validate_level(level) == []
+        assert level.to_dict() == generated[level.meta.level_id]

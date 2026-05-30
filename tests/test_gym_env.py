@@ -89,4 +89,4 @@ def test_run_episode_helper() -> None:
     assert stats.steps == 3
     assert stats.reward > 0.0
     assert stats.terminated is False
-    assert stats.truncated is False
+    assert stats.truncated is True

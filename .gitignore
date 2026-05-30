@@ -63,3 +63,7 @@ coverage.xml
 
 # Project outputs (keep dataset/.gitkeep)
 dataset/episodes/
+checkpoints/
+
+# Local workspace files
+AGENTS.md
