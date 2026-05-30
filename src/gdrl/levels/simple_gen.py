@@ -54,6 +54,28 @@ def make_single_spike_sweep(spike_xs: list[int] | None = None) -> list[Level]:
     ]
 
 
+def make_two_spike_sweep(
+    first_xs: list[int] | None = None,
+    gaps: list[int] | None = None,
+) -> list[Level]:
+    starts = first_xs or [10, 12, 14]
+    spacing = gaps or [6, 8, 10, 12]
+    levels: list[Level] = []
+    for first_x in starts:
+        for gap in spacing:
+            second_x = first_x + gap
+            levels.append(
+                make_fixed_spike_level(
+                    f"two_spikes_x{first_x}_gap{gap}",
+                    f"Two Spikes X{first_x} Gap {gap}",
+                    [first_x, second_x],
+                    width=max(36, second_x + 14),
+                    tags=["train", "generated", "two_spike"],
+                )
+            )
+    return levels
+
+
 def make_fixed_spike_level(
     level_id: str,
     name: str,

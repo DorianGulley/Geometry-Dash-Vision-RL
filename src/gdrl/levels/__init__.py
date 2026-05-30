@@ -14,6 +14,7 @@ from .simple_gen import (
     make_simple_level,
     make_single_spike_sweep,
     make_tiny_spike_level,
+    make_two_spike_sweep,
 )
 from .validation import ValidationError, validate_level
 
@@ -30,6 +31,7 @@ __all__ = [
     "make_simple_level",
     "make_single_spike_sweep",
     "make_tiny_spike_level",
+    "make_two_spike_sweep",
     "SimpleLevelConfig",
     "save_level",
     "ValidationError",

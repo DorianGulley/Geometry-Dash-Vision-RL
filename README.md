@@ -126,10 +126,12 @@ python scripts/eval_visual_baseline.py levels/curriculum
 Train PPO on all JSON levels in a directory:
 
 ```bash
-python scripts/train_ppo.py levels/curriculum --updates 20
+python scripts/train_ppo.py levels/curriculum --updates 20 --metrics-dir artifacts/ppo
 ```
 
-Regenerate the single-spike training sweep:
+This writes `training_episodes.csv`, `eval_by_level.csv`, and training/eval plots.
+
+Regenerate the simple single-spike and two-spike training sweeps:
 
 ```bash
 python scripts/generate_levels.py
